@@ -1,18 +1,18 @@
+
 import sys
 import math
 from pydantic import BaseModel, Field
 from litellm import completion
 from dotenv import load_dotenv
-
+import os 
 from evaluation.test import TestQuestion, load_tests
 from implementation.answer import answer_question, fetch_context
-
+import litellm
 
 load_dotenv(override=True)
 
-MODEL = "gpt-4.1-nano"
+MODEL = "ollama/qwen2.5:3b"
 db_name = "vector_db"
-
 
 class RetrievalEval(BaseModel):
     """Evaluation metrics for retrieval performance."""
@@ -153,7 +153,7 @@ Provide detailed feedback and scores from 1 (very poor) to 5 (ideal) for each di
     ]
 
     # Call LLM judge with structured outputs (async)
-    judge_response = completion(model=MODEL, messages=judge_messages, response_format=AnswerEval)
+    judge_response = completion(model=MODEL,api_base="http://localhost:11434",messages=judge_messages, response_format=AnswerEval)
 
     answer_eval = AnswerEval.model_validate_json(judge_response.choices[0].message.content)
 
