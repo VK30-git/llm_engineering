@@ -1,7 +1,7 @@
 import gradio as gr
 from dotenv import load_dotenv
 
-from implementation.answer import answer_question
+from pro_implementation.answer import answer_question
 
 load_dotenv(override=True)
 
@@ -29,7 +29,7 @@ def main():
     theme = gr.themes.Soft(font=["Inter", "system-ui", "sans-serif"])
 
     with gr.Blocks(title="Insurellm Expert Assistant", theme=theme) as ui:
-        gr.Markdown("# 🏢 Insurellm Expert Assistant\nAsk me anything about Insurellm!")
+        gr.Markdown("# 🏢  AI Knowledge Assistant\nAsk me anything about Insurellm!")
 
         with gr.Row():
             with gr.Column(scale=1):

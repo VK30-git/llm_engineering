@@ -6,24 +6,24 @@ from chromadb import PersistentClient
 from tqdm import tqdm
 from litellm import completion
 from multiprocessing import Pool
-from tenacity import retry, wait_exponential
-
-
+from tenacity import retry, wait_exponential #To identify rate limit error
+import os 
+from sentence_transformers import SentenceTransformer
 load_dotenv(override=True)
 
-MODEL = "openai/gpt-4.1-nano"
+MODEL = "ollama_chat/gemma3:4b"
 
 DB_NAME = str(Path(__file__).parent.parent / "preprocessed_db")
 collection_name = "docs"
-embedding_model = "text-embedding-3-large"
+embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 KNOWLEDGE_BASE_PATH = Path(__file__).parent.parent / "knowledge-base"
 AVERAGE_CHUNK_SIZE = 100
 wait = wait_exponential(multiplier=1, min=10, max=240)
 
 
-WORKERS = 3
+WORKERS = 1
 
-openai = OpenAI()
+""" openai = OpenAI(base_url="https://openrouter.ai/api/v1",api_key=api_key) """
 
 
 class Result(BaseModel):
@@ -103,7 +103,7 @@ def make_messages(document):
 @retry(wait=wait)
 def process_document(document):
     messages = make_messages(document)
-    response = completion(model=MODEL, messages=messages, response_format=Chunks)
+    response = completion(model=MODEL, messages=messages, response_format=Chunks,api_base="http://localhost:11434")
     reply = response.choices[0].message.content
     doc_as_chunks = Chunks.model_validate_json(reply).chunks
     return [chunk.as_result(document) for chunk in doc_as_chunks]
@@ -127,8 +127,11 @@ def create_embeddings(chunks):
         chroma.delete_collection(collection_name)
 
     texts = [chunk.page_content for chunk in chunks]
-    emb = openai.embeddings.create(model=embedding_model, input=texts).data
-    vectors = [e.embedding for e in emb]
+   
+    vectors = embedding_model.encode(
+        texts,
+        convert_to_numpy=True
+    ).tolist()
 
     collection = chroma.get_or_create_collection(collection_name)
 

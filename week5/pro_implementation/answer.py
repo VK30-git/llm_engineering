@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 from pathlib import Path
 from tenacity import retry, wait_exponential
 
-
+from sentence_transformers import SentenceTransformer
 load_dotenv(override=True)
 
 # MODEL = "openai/gpt-4.1-nano"
@@ -16,7 +16,7 @@ KNOWLEDGE_BASE_PATH = Path(__file__).parent.parent / "knowledge-base"
 SUMMARIES_PATH = Path(__file__).parent.parent / "summaries"
 
 collection_name = "docs"
-embedding_model = "text-embedding-3-large"
+embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 wait = wait_exponential(multiplier=1, min=10, max=240)
 
 openai = OpenAI()
