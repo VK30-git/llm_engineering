@@ -15,8 +15,8 @@ REMOVALS = [
     "Batteries Required?",
     "Item model number",
 ]
-
-
+#allows me to read some data from HF and make into itemobject
+#helps us to create a real curated data by parsing it 
 def simplify(text_list) -> str:
     """
     Return a simplified string without too much whitespace and limited to MAX_TEXT characters
@@ -68,7 +68,7 @@ def get_weight(details):
             return amount / 100
     return 0
 
-
+#helps us to convert into itemobject
 def parse(datapoint, category):
     try:
         price = float(datapoint["price"])

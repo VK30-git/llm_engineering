@@ -5,7 +5,7 @@ from typing import Optional, Self
 
 PREFIX = "Price is $"
 QUESTION = "What does this cost to the nearest dollar?"
-
+#allows convertion of json and vice versa
 
 class Item(BaseModel):
     """
